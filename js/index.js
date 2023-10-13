@@ -4,7 +4,42 @@ const ctx = canvas.getContext("2d");
 canvas.width = 1424;
 canvas.height = 800;
 
-const FIELD_LENGTH = 50000;
+const FIELD_LENGTH = 20000;
+
+const direction = [
+  {
+    x: 0,
+    y: 1,
+  },
+  {
+    x: -1,
+    y: 1,
+  },
+  {
+    x: -1,
+    y: 0,
+  },
+  {
+    x: 0,
+    y: -1,
+  },
+  {
+    x: 1,
+    y: -1,
+  },
+  {
+    x: 1,
+    y: 0,
+  },
+  {
+    x: 1,
+    y: 1,
+  },
+  {
+    x: -1,
+    y: -1,
+  },
+];
 
 const keys = {
   arrowLeft: {
@@ -15,13 +50,52 @@ const keys = {
   },
 };
 
+class Vector {
+  constructor(x = 0, y = 0) {
+    this.x = x;
+    this.y = y;
+  }
+
+  add(v) {
+    this.x += v.x;
+    this.y += v.y;
+  }
+
+  sub(v) {
+    this.x -= v.x;
+    this.y -= v.y;
+  }
+
+  mult(n) {
+    this.x *= n;
+    this.y *= n;
+  }
+
+  mag() {
+    return Math.sqrt(this.x * this.x + this.y + this.y);
+  }
+
+  get() {
+    return new Vector(this.x, this.y);
+  }
+
+  normalize() {
+    this.x = normalize(this.x);
+    this.y = normalize(this.y);
+  }
+
+  copy() {
+    return new Vector(this.x, this.y);
+  }
+}
+
 class Player {
   constructor({ position, degree }) {
     this.position = position;
     this.width = 20;
     this.height = 60;
     this.degree = degree;
-    this.rotation = 0.15;
+    this.rotation = 0;
   }
 
   draw() {
@@ -62,8 +136,13 @@ class Cloud {
   }
 
   update() {
-    this.position.x += this.velocity.x;
-    this.position.y += this.velocity.y;
+    if (player.rotation !== 0) {
+      this.position.x += this.velocity.x;
+      this.position.y += this.velocity.y;
+    } else {
+      this.position.x += this.velocity.x;
+      this.position.y += this.velocity.y;
+    }
   }
 }
 
@@ -102,17 +181,25 @@ function animate() {
     clouds[i].draw();
   }
 
+  let direction = new Vector(
+    -Math.sin(player.rotation),
+    Math.cos(player.rotation)
+  );
+
+  for (let j = 0; j < clouds.length; j++) {
+    clouds[j].velocity.x = 5 * direction.x;
+    clouds[j].velocity.y = 5 * direction.y;
+  }
+  console.log(player.rotation);
   if (keys.arrowLeft.pressed) {
     player.rotation -= 0.05;
   } else if (keys.arrowRight.pressed) {
     player.rotation += 0.05;
   }
-
   player.draw();
 }
 
 window.addEventListener("keydown", (e) => {
-  console.log(e.key);
   switch (e.key) {
     case "ArrowRight":
       keys.arrowRight.pressed = true;
