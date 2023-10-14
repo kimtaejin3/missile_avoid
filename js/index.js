@@ -90,15 +90,27 @@ class Vector {
 }
 
 class Player {
-  constructor({ position, degree }) {
-    this.position = position;
-    this.width = 20;
-    this.height = 60;
-    this.degree = degree;
+  constructor() {
+    // this.width = 20;
+    // this.height = 60;
     this.rotation = 0;
+
+    const image = new Image();
+    image.src = "./player.png";
+
+    image.onload = () => {
+      this.image = image;
+      this.width = image.width * 0.12;
+      this.height = image.height * 0.12;
+      this.position = {
+        x: canvas.width / 2 - this.width / 2,
+        y: canvas.height / 2 - this.height / 2,
+      };
+    };
   }
 
   draw() {
+    if (!this.image) return;
     ctx.save();
     ctx.translate(
       player.position.x + player.width / 2,
@@ -109,8 +121,13 @@ class Player {
       -player.position.x - player.width / 2,
       -player.position.y - player.height / 2
     );
-    ctx.fillStyle = "red";
-    ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
+    ctx.drawImage(
+      this.image,
+      this.position.x,
+      this.position.y,
+      this.width,
+      this.height
+    );
     ctx.restore();
   }
 }
@@ -127,7 +144,6 @@ class Cloud {
 
   draw() {
     ctx.beginPath();
-    ctx.globalAlpha = "0.7";
     ctx.fillStyle = "white";
     ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI);
     ctx.fill();
@@ -157,7 +173,7 @@ class Emission {
   draw() {
     ctx.save();
     ctx.beginPath();
-    ctx.fillStyle = "#4a4848";
+    ctx.fillStyle = "#9c9c9c";
     ctx.globalAlpha = `${this.blur}`;
     ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI);
     ctx.fill();
@@ -176,12 +192,7 @@ class Emission {
   }
 }
 
-const player = new Player({
-  position: {
-    x: canvas.width / 2,
-    y: canvas.height / 2,
-  },
-});
+const player = new Player();
 
 const clouds = [];
 
@@ -226,8 +237,8 @@ function animate() {
 
   emissions.forEach((emission, i) => {
     if (
-      Math.abs(emission.position.y - player.position.y) > 110 ||
-      Math.abs(emission.position.x - player.position.x) > 100
+      Math.abs(emission.position.y - canvas.height / 2) > 110 ||
+      Math.abs(emission.position.x - canvas.width / 2) > 50
     ) {
       setTimeout(() => {
         emissions.splice(i, 1);
@@ -244,8 +255,8 @@ function animate() {
     emissions.push(
       new Emission({
         position: {
-          x: canvas.width / 2 + player.width / 2,
-          y: canvas.height / 2 + player.height / 2,
+          x: canvas.width / 2,
+          y: canvas.height / 2,
         },
         velocity: {
           x: 5 * direction.x,
