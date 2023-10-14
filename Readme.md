@@ -6,6 +6,7 @@
 - [x] Player & Cloud 생성
 - [x] Clouds 움직이기 구현
 - [x] player의 움직임에 따른 Clouds 움직임 구현
+- [x] 전투기(Player) 배기(emission) 구현
 
 ## 개발 과정 (2023-10-13)
 

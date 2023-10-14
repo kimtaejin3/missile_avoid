@@ -146,6 +146,36 @@ class Cloud {
   }
 }
 
+class Emission {
+  constructor({ position, velocity }) {
+    this.position = position;
+    this.velocity = velocity;
+    this.radius = 4;
+    this.blur = 1;
+  }
+
+  draw() {
+    ctx.save();
+    ctx.beginPath();
+    ctx.fillStyle = "#4a4848";
+    ctx.globalAlpha = `${this.blur}`;
+    ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.closePath();
+    ctx.restore();
+  }
+
+  update() {
+    if (player.rotation !== 0) {
+      this.position.x += this.velocity.x;
+      this.position.y += this.velocity.y;
+    } else {
+      this.position.x += this.velocity.x;
+      this.position.y += this.velocity.y;
+    }
+  }
+}
+
 const player = new Player({
   position: {
     x: canvas.width / 2,
@@ -160,7 +190,7 @@ for (let i = 0; i < FIELD_LENGTH / 2; i++) {
     new Cloud({
       position: {
         x:
-          Math.floor(Math.random() * (canvas.width + FIELD_LENGTH)) -
+          Math.floor(Math.random() * (canvas.width + FIELD_LENGTH * 2)) -
           FIELD_LENGTH,
         y:
           Math.floor(Math.random() * (canvas.height + FIELD_LENGTH)) -
@@ -171,6 +201,9 @@ for (let i = 0; i < FIELD_LENGTH / 2; i++) {
   );
 }
 
+let emissions = [];
+
+let t = 0;
 function animate() {
   window.requestAnimationFrame(animate);
   ctx.fillStyle = "#d4eeff";
@@ -190,7 +223,39 @@ function animate() {
     clouds[j].velocity.x = 5 * direction.x;
     clouds[j].velocity.y = 5 * direction.y;
   }
-  console.log(player.rotation);
+
+  emissions.forEach((emission, i) => {
+    if (
+      Math.abs(emission.position.y - player.position.y) > 110 ||
+      Math.abs(emission.position.x - player.position.x) > 100
+    ) {
+      setTimeout(() => {
+        emissions.splice(i, 1);
+      }, 0);
+    }
+    emission.velocity.x = 4 * direction.x;
+    emission.velocity.y = 4 * direction.y;
+
+    emission.update();
+    emission.draw();
+  });
+
+  if (t % 7 === 0 && emissions.length < 20) {
+    emissions.push(
+      new Emission({
+        position: {
+          x: canvas.width / 2 + player.width / 2,
+          y: canvas.height / 2 + player.height / 2,
+        },
+        velocity: {
+          x: 5 * direction.x,
+          y: 5 * direction.y,
+        },
+      })
+    );
+  }
+
+  t++;
   if (keys.arrowLeft.pressed) {
     player.rotation -= 0.05;
   } else if (keys.arrowRight.pressed) {
