@@ -174,7 +174,6 @@ class Emission {
     ctx.save();
     ctx.beginPath();
     ctx.fillStyle = "#9c9c9c";
-    ctx.globalAlpha = `${this.blur}`;
     ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI);
     ctx.fill();
     ctx.closePath();
@@ -192,7 +191,60 @@ class Emission {
   }
 }
 
+class Missile {
+  constructor({ position, velocity }) {
+    this.position = position;
+    this.velocity = velocity;
+    this.width = 10;
+    this.height = 30;
+  }
+
+  draw() {
+    ctx.fillStyle = "red";
+    ctx.save();
+    ctx.translate(
+      this.position.x + this.width / 2,
+      this.position.y + this.height / 2
+    );
+    ctx.rotate(-Math.atan2(this.velocity.x, this.velocity.y));
+    ctx.translate(
+      -this.position.x - this.width / 2,
+      -this.position.y - this.height / 2
+    );
+    ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
+    ctx.restore();
+  }
+
+  update() {
+    this.position.x += this.velocity.x;
+    this.position.y += this.velocity.y;
+
+    this.draw();
+  }
+}
+
 const player = new Player();
+const missile = new Missile({
+  position: {
+    x: 0,
+    y: 0,
+  },
+  velocity: {
+    x: 1,
+    y: 5,
+  },
+});
+
+const missile2 = new Missile({
+  position: {
+    x: canvas.width,
+    y: 0,
+  },
+  velocity: {
+    x: -1,
+    y: 1,
+  },
+});
 
 const clouds = [];
 
@@ -266,13 +318,21 @@ function animate() {
     );
   }
 
-  t++;
   if (keys.arrowLeft.pressed) {
     player.rotation -= 0.05;
   } else if (keys.arrowRight.pressed) {
     player.rotation += 0.05;
   }
   player.draw();
+
+  missile.velocity.x += 0.12;
+  missile.velocity.y -= 0.02;
+  missile.update();
+
+  missile2.velocity.y += 0.01;
+  missile2.velocity.x -= 0.06;
+  missile2.update();
+  t++;
 }
 
 window.addEventListener("keydown", (e) => {
