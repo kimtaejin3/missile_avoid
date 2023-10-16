@@ -197,9 +197,19 @@ class Missile {
     this.velocity = velocity;
     this.width = 10;
     this.height = 30;
+
+    const image = new Image();
+    image.src = "./missile.png";
+
+    image.onload = () => {
+      this.image = image;
+      this.width = image.width * 0.06;
+      this.height = image.height * 0.06;
+    };
   }
 
   draw() {
+    if (!this.image) return;
     ctx.fillStyle = "red";
     ctx.save();
     ctx.translate(
@@ -211,7 +221,13 @@ class Missile {
       -this.position.x - this.width / 2,
       -this.position.y - this.height / 2
     );
-    ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
+    ctx.drawImage(
+      this.image,
+      this.position.x,
+      this.position.y,
+      this.width,
+      this.height
+    );
     ctx.restore();
   }
 

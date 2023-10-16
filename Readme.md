@@ -8,7 +8,8 @@
 - [x] player의 움직임에 따른 Clouds 움직임 구현
 - [x] 전투기(Player) 배기(emission) 구현
 - [x] Add Sprite - 전투기 (Player)
-- [x] 미사일 클래서 생성
+- [x] 미사일 클래스 생성
+- [x] Add Sprite - 미사일 & 전투기 sprite 추가
 
 ## 개발 과정 (2023-10-13)
 
