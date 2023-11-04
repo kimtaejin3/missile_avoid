@@ -6,41 +6,6 @@ canvas.height = 800;
 
 const FIELD_LENGTH = 20000;
 
-const direction = [
-  {
-    x: 0,
-    y: 1,
-  },
-  {
-    x: -1,
-    y: 1,
-  },
-  {
-    x: -1,
-    y: 0,
-  },
-  {
-    x: 0,
-    y: -1,
-  },
-  {
-    x: 1,
-    y: -1,
-  },
-  {
-    x: 1,
-    y: 0,
-  },
-  {
-    x: 1,
-    y: 1,
-  },
-  {
-    x: -1,
-    y: -1,
-  },
-];
-
 const keys = {
   arrowLeft: {
     pressed: false,
@@ -203,8 +168,8 @@ class Missile {
 
     image.onload = () => {
       this.image = image;
-      this.width = image.width * 0.06;
-      this.height = image.height * 0.06;
+      this.width = image.width * 0.08;
+      this.height = image.height * 0.08;
     };
   }
 
@@ -240,27 +205,6 @@ class Missile {
 }
 
 const player = new Player();
-const missile = new Missile({
-  position: {
-    x: 0,
-    y: 0,
-  },
-  velocity: {
-    x: 1,
-    y: 5,
-  },
-});
-
-const missile2 = new Missile({
-  position: {
-    x: canvas.width,
-    y: 0,
-  },
-  velocity: {
-    x: -1,
-    y: 1,
-  },
-});
 
 const clouds = [];
 
@@ -281,8 +225,21 @@ for (let i = 0; i < FIELD_LENGTH / 2; i++) {
 }
 
 let emissions = [];
+const missiles = [];
+
+const missile = new Missile({
+  position: {
+    x: canvas.width / 2 - 20,
+    y: 800,
+  },
+  velocity: {
+    x: 0,
+    y: 0,
+  },
+});
 
 let t = 0;
+let flag = false;
 function animate() {
   window.requestAnimationFrame(animate);
   ctx.fillStyle = "#d4eeff";
@@ -341,13 +298,30 @@ function animate() {
   }
   player.draw();
 
-  missile.velocity.x += 0.12;
-  missile.velocity.y -= 0.02;
+  console.log(missile.velocity.x, missile.velocity.y);
+  if (keys.arrowLeft.pressed) {
+    if (missile.position.y > player.position.y) {
+      missile.velocity.x += 0.14;
+      missile.velocity.y -= 0.2;
+    }
+    flag = true;
+  } else if (keys.arrowRight.pressed) {
+    if (missile.position.y > player.position.y) {
+      missile.velocity.x -= 0.14;
+      missile.velocity.y -= 0.3;
+    }
+    flag = true;
+  } else {
+    if (!flag) {
+      missile.velocity.x = -direction.x * 6;
+      missile.velocity.y = -direction.y * 6;
+    }
+  }
+
+  console.log(player.width);
+
   missile.update();
 
-  missile2.velocity.y += 0.01;
-  missile2.velocity.x -= 0.06;
-  missile2.update();
   t++;
 }
 

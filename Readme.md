@@ -10,6 +10,7 @@
 - [x] Add Sprite - 전투기 (Player)
 - [x] 미사일 클래스 생성
 - [x] Add Sprite - 미사일 & 전투기 sprite 추가
+- [x] 전투기(Player)의 조작에 따른 미사일 움직임 구현
 
 ## 개발 과정 (2023-10-13)
 
