@@ -38,3 +38,9 @@ ctx.rotate(-Math.atan2(this.velocity.x, this.velocity.y));
 ```
 
 - Math.atan2의 부정값!
+
+## 개발 과정 (2023-11-04)
+
+<img src="./screen03.png" width="500">
+
+- 전투기 조작에 따른 missile 움직임 세부 변화 구현
