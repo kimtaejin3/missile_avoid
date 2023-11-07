@@ -162,6 +162,7 @@ class Missile {
     this.velocity = velocity;
     this.width = 10;
     this.height = 30;
+    this.flag = false;
 
     const image = new Image();
     image.src = "./missile.png";
@@ -225,18 +226,29 @@ for (let i = 0; i < FIELD_LENGTH / 2; i++) {
 }
 
 let emissions = [];
-const missiles = [];
+const missiles = [
+  new Missile({
+    position: {
+      x: canvas.width / 2 - 20,
+      y: 800,
+    },
+    velocity: {
+      x: 0,
+      y: 0,
+    },
+  }),
+];
 
-const missile = new Missile({
-  position: {
-    x: canvas.width / 2 - 20,
-    y: 800,
-  },
-  velocity: {
-    x: 0,
-    y: 0,
-  },
-});
+// const missile = new Missile({
+//   position: {
+//     x: canvas.width / 2 - 20,
+//     y: 800,
+//   },
+//   velocity: {
+//     x: 0,
+//     y: 0,
+//   },
+// });
 
 let t = 0;
 let flag = false;
@@ -298,29 +310,46 @@ function animate() {
   }
   player.draw();
 
-  console.log(missile.velocity.x, missile.velocity.y);
-  if (keys.arrowLeft.pressed) {
-    if (missile.position.y > player.position.y) {
-      missile.velocity.x += 0.14;
-      missile.velocity.y -= 0.2;
-    }
-    flag = true;
-  } else if (keys.arrowRight.pressed) {
-    if (missile.position.y > player.position.y) {
-      missile.velocity.x -= 0.14;
-      missile.velocity.y -= 0.3;
-    }
-    flag = true;
-  } else {
-    if (!flag) {
-      missile.velocity.x = -direction.x * 6;
-      missile.velocity.y = -direction.y * 6;
-    }
+  let direction2 = new Vector(
+    -Math.sin(player.rotation),
+    Math.cos(player.rotation)
+  );
+
+  if (t % 100 === 0) {
+    missiles.push(
+      new Missile({
+        position: {
+          x: canvas.width / 2 - player.width / 2 + 10 + direction2.x * 800,
+          y: canvas.height / 2 + direction2.y * 800,
+        },
+        velocity: {
+          x: 0,
+          y: 0,
+        },
+      })
+    );
   }
 
-  console.log(player.width);
+  missiles.forEach((missile) => {
+    if (keys.arrowLeft.pressed) {
+      missile.velocity.x += 0.09;
+      missile.velocity.y -= 0.2;
+      missile.flag = true;
+    } else if (keys.arrowRight.pressed) {
+      missile.velocity.x -= 0.09;
+      missile.velocity.y -= 0.2;
+      missile.flag = true;
+    } else {
+      if (!missile.flag) {
+        missile.velocity.x = -direction.x * 3;
+        missile.velocity.y = -direction.y * 3;
+      }
+    }
+  });
 
-  missile.update();
+  missiles.forEach((missile) => {
+    missile.update();
+  });
 
   t++;
 }
