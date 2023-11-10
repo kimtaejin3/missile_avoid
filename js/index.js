@@ -13,6 +13,12 @@ const keys = {
   arrowRight: {
     pressed: false,
   },
+  arrowUp: {
+    pressed: false,
+  },
+  arrowDown: {
+    pressed: false,
+  },
 };
 
 class Vector {
@@ -45,8 +51,14 @@ class Vector {
   }
 
   normalize() {
-    this.x = normalize(this.x);
-    this.y = normalize(this.y);
+    // this.x = normalize(this.x);
+    // this.y = normalize(this.y);
+    const magnitude = Math.sqrt(this.x * this.x + this.y * this.y);
+    if (magnitude !== 0) {
+      this.x /= magnitude;
+      this.y /= magnitude;
+    }
+    return this;
   }
 
   copy() {
@@ -169,8 +181,8 @@ class Missile {
 
     image.onload = () => {
       this.image = image;
-      this.width = image.width * 0.08;
-      this.height = image.height * 0.08;
+      this.width = image.width * 0.06;
+      this.height = image.height * 0.06;
     };
   }
 
@@ -178,6 +190,7 @@ class Missile {
     if (!this.image) return;
     ctx.fillStyle = "red";
     ctx.save();
+
     ctx.translate(
       this.position.x + this.width / 2,
       this.position.y + this.height / 2
@@ -187,6 +200,7 @@ class Missile {
       -this.position.x - this.width / 2,
       -this.position.y - this.height / 2
     );
+
     ctx.drawImage(
       this.image,
       this.position.x,
@@ -227,31 +241,26 @@ for (let i = 0; i < FIELD_LENGTH / 2; i++) {
 
 let emissions = [];
 const missiles = [
-  new Missile({
-    position: {
-      x: canvas.width / 2 - 20,
-      y: 800,
-    },
-    velocity: {
-      x: 0,
-      y: 0,
-    },
-  }),
+  // new Missile({
+  //   position: {
+  //     x: canvas.width / 2 - 20,
+  //     y: 800,
+  //   },
+  //   velocity: {
+  //     x: 0,
+  //     y: 0,
+  //   },
+  //   acc: {
+  //     x: 0,
+  //     y: 0,
+  //   },
+  // }),
 ];
-
-// const missile = new Missile({
-//   position: {
-//     x: canvas.width / 2 - 20,
-//     y: 800,
-//   },
-//   velocity: {
-//     x: 0,
-//     y: 0,
-//   },
-// });
 
 let t = 0;
 let flag = false;
+let x = canvas.width / 2;
+let y = canvas.height / 2;
 function animate() {
   window.requestAnimationFrame(animate);
   ctx.fillStyle = "#d4eeff";
@@ -315,39 +324,52 @@ function animate() {
     Math.cos(player.rotation)
   );
 
+  // if (t % 100 === 0) {
+  //   missiles.push(
+  //     new Missile({
+  //       position: {
+  //         x: canvas.width / 2 - player.width / 2 + 10 + direction2.x * 800,
+  //         y: canvas.height / 2 + direction2.y * 800,
+  //       },
+  //       velocity: {
+  //         x: -5 * direction.x,
+  //         y: -5 * direction.y,
+  //       },
+  //       acc: {
+  //         x: 0,
+  //         y: 0,
+  //       },
+  //     })
+  //   );
+  // }
   if (t % 100 === 0) {
     missiles.push(
       new Missile({
         position: {
-          x: canvas.width / 2 - player.width / 2 + 10 + direction2.x * 800,
-          y: canvas.height / 2 + direction2.y * 800,
+          x: 10,
+          y: 700,
         },
         velocity: {
           x: 0,
-          y: 0,
+          y: 5,
         },
       })
     );
   }
 
   missiles.forEach((missile) => {
-    if (keys.arrowLeft.pressed) {
-      missile.velocity.x += 0.09;
-      missile.velocity.y -= 0.2;
-      missile.flag = true;
-    } else if (keys.arrowRight.pressed) {
-      missile.velocity.x -= 0.09;
-      missile.velocity.y -= 0.2;
-      missile.flag = true;
-    } else {
-      if (!missile.flag) {
-        missile.velocity.x = -direction.x * 3;
-        missile.velocity.y = -direction.y * 3;
-      }
-    }
-  });
+    let angle_x = x + direction.x * 40 - missile.position.x;
+    let angle_y = y + direction.y * 40 - missile.position.y;
 
-  missiles.forEach((missile) => {
+    angle = Math.atan2(angle_y, angle_x);
+    direction3 = new Vector(Math.cos(angle), Math.sin(angle));
+    let delay = 0.4;
+    missile.velocity.x = direction3.x * 10;
+    missile.velocity.y = direction3.y * 10;
+
+    ctx.fillStyle = "red";
+    ctx.fillRect(x + direction.x * 40, y + direction.y * 40, 10, 10);
+
     missile.update();
   });
 
@@ -362,6 +384,12 @@ window.addEventListener("keydown", (e) => {
     case "ArrowLeft":
       keys.arrowLeft.pressed = true;
       break;
+    case "ArrowUp":
+      keys.arrowUp.pressed = true;
+      break;
+    case "ArrowDown":
+      keys.arrowDown.pressed = true;
+      break;
   }
 });
 
@@ -372,6 +400,12 @@ window.addEventListener("keyup", (e) => {
       break;
     case "ArrowLeft":
       keys.arrowLeft.pressed = false;
+      break;
+    case "ArrowUp":
+      keys.arrowUp.pressed = false;
+      break;
+    case "ArrowDown":
+      keys.arrowDown.pressed = false;
       break;
   }
 });
