@@ -6,12 +6,16 @@ canvas.height = 800;
 
 const FIELD_LENGTH = 20000;
 
+// 키 입력 상태와 타이머 추가
 const keys = {
-  arrowLeft: { pressed: false },
-  arrowRight: { pressed: false },
-  arrowUp: { pressed: false },
-  arrowDown: { pressed: false },
+  arrowLeft: { pressed: false, lastReleased: 0 },
+  arrowRight: { pressed: false, lastReleased: 0 },
+  arrowUp: { pressed: false, lastReleased: 0 },
+  arrowDown: { pressed: false, lastReleased: 0 },
 };
+
+// 방향키 딜레이 시간 (밀리초)
+const KEY_DELAY = 1000;
 
 class Vector {
   constructor(x = 0, y = 0) {
@@ -241,10 +245,10 @@ function animate() {
   player.draw();
 
   // 미사일 발사 주기
-  if (t % 100 === 0) {
+  if (t % 10000 === 0) {
     missiles.push(
       new Missile({
-        position: { x: 10, y: 700 },
+        position: { x: 1200, y: 10 },
         velocity: { x: 7, y: 5 },
       })
     );
@@ -252,8 +256,52 @@ function animate() {
 
   // 미사일 유도
   missiles.forEach((missile) => {
-    const targetX = canvas.width / 2;
-    const targetY = canvas.height / 2;
+    // 현재 시간 가져오기
+    const currentTime = Date.now();
+
+    // 방향키를 누르고 있거나 최근에 눌렀다 뗀 경우 확인
+    const isPlayerMoving =
+      keys.arrowLeft.pressed ||
+      keys.arrowRight.pressed ||
+      keys.arrowUp.pressed ||
+      keys.arrowDown.pressed;
+
+    // 최근에 키를 뗀 시간 확인
+    const lastKeyReleased = Math.max(
+      keys.arrowLeft.lastReleased,
+      keys.arrowRight.lastReleased,
+      keys.arrowUp.lastReleased,
+      keys.arrowDown.lastReleased
+    );
+
+    // 키를 뗀 후 딜레이 시간 내에 있는지 확인
+    const isInDelay = currentTime - lastKeyReleased < KEY_DELAY;
+
+    // 키를 누르고 있거나 딜레이 시간 내에 있으면 직선 이동
+    const shouldMaintainDirection = isPlayerMoving || isInDelay;
+
+    let targetX, targetY;
+    let rotationSpeed;
+
+    if (shouldMaintainDirection) {
+      // 방향키를 누르고 있거나 딜레이 시간 내에 있으면 미사일은 원래 각도와 속도 유지
+      targetX = missile.position.x + missile.velocity.x * 10; // 현재 진행 방향으로 계속 이동
+      targetY = missile.position.y + missile.velocity.y * 10;
+      rotationSpeed = 0.01; // 느린 회전 속도
+    } else {
+      // 방향키를 누르지 않고 딜레이 시간도 지났으면 중앙으로 유도
+      targetX = canvas.width / 2;
+      targetY = canvas.height / 2;
+      rotationSpeed = 0.05; // 빠른 회전 속도
+    }
+
+    // 딜레이 시간 내에 있다면 점진적으로 회전 속도 증가
+    if (isInDelay && !isPlayerMoving) {
+      // 딜레이 시간 내 경과 비율 (0~1)
+      const delayProgress = (currentTime - lastKeyReleased) / KEY_DELAY;
+      // 회전 속도를 점진적으로 증가 (0.01에서 0.05로)
+      rotationSpeed = 0.01 + 0.04 * delayProgress;
+    }
 
     const dx = targetX - missile.position.x;
     const dy = targetY - missile.position.y;
@@ -261,15 +309,16 @@ function animate() {
 
     let diff = targetAngle - missile.angle;
     diff = Math.atan2(Math.sin(diff), Math.cos(diff));
-    missile.angle += diff * 0.05; // 유도 회전 속도
 
-    const baseSpeed = 5.5;
+    missile.angle += diff * rotationSpeed;
+
+    const baseSpeed = 4;
     missile.velocity.x = Math.cos(missile.angle) * baseSpeed;
     missile.velocity.y = Math.sin(missile.angle) * baseSpeed;
 
     // 구름처럼 플레이어 각도에 따른 월드 속도 보정
-    missile.velocity.x += 2.3 * direction.x;
-    missile.velocity.y += 2.3 * direction.y;
+    missile.velocity.x += 2 * direction.x;
+    missile.velocity.y += 2 * direction.y;
 
     missile.update();
   });
@@ -295,18 +344,24 @@ window.addEventListener("keydown", (e) => {
 });
 
 window.addEventListener("keyup", (e) => {
+  const currentTime = Date.now();
+
   switch (e.key) {
     case "ArrowRight":
       keys.arrowRight.pressed = false;
+      keys.arrowRight.lastReleased = currentTime;
       break;
     case "ArrowLeft":
       keys.arrowLeft.pressed = false;
+      keys.arrowLeft.lastReleased = currentTime;
       break;
     case "ArrowUp":
       keys.arrowUp.pressed = false;
+      keys.arrowUp.lastReleased = currentTime;
       break;
     case "ArrowDown":
       keys.arrowDown.pressed = false;
+      keys.arrowDown.lastReleased = currentTime;
       break;
   }
 });
