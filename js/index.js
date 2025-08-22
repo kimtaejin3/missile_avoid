@@ -207,8 +207,8 @@ function animate() {
   );
 
   for (let j = 0; j < clouds.length; j++) {
-    clouds[j].velocity.x = 5 * direction.x;
-    clouds[j].velocity.y = 5 * direction.y;
+    clouds[j].velocity.x = 3 * direction.x;
+    clouds[j].velocity.y = 3 * direction.y;
   }
 
   emissions.forEach((emission, i) => {
@@ -245,7 +245,7 @@ function animate() {
     missiles.push(
       new Missile({
         position: { x: 10, y: 700 },
-        velocity: { x: 0, y: 5 },
+        velocity: { x: 7, y: 5 },
       })
     );
   }
@@ -263,13 +263,13 @@ function animate() {
     diff = Math.atan2(Math.sin(diff), Math.cos(diff));
     missile.angle += diff * 0.05; // 유도 회전 속도
 
-    const baseSpeed = 5;
+    const baseSpeed = 5.5;
     missile.velocity.x = Math.cos(missile.angle) * baseSpeed;
     missile.velocity.y = Math.sin(missile.angle) * baseSpeed;
 
     // 구름처럼 플레이어 각도에 따른 월드 속도 보정
-    missile.velocity.x += 2 * direction.x;
-    missile.velocity.y += 2 * direction.y;
+    missile.velocity.x += 2.3 * direction.x;
+    missile.velocity.y += 2.3 * direction.y;
 
     missile.update();
   });
