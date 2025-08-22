@@ -12,6 +12,7 @@
 - [x] Add Sprite - 미사일 & 전투기 sprite 추가
 - [x] 전투기(Player)의 조작에 따른 미사일 움직임 구현
 - [x] 전투기(Player) 각도에 따른 미사일 초기 위치 & 속도 설정
+- [] 미사일 유도 구현
 
 ## 개발 과정 (2023-10-13)
 
@@ -45,3 +46,10 @@ ctx.rotate(-Math.atan2(this.velocity.x, this.velocity.y));
 <img src="./screen03.png" width="500">
 
 - 전투기 조작에 따른 missile 움직임 세부 변화 구현
+
+## 개발 과정 (2025-08-22)
+
+<img src="./screen04.png" width="500">
+
+- 프로젝트 다시 시작
+- 미사일 유도 코드 수정

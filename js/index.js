@@ -7,18 +7,10 @@ canvas.height = 800;
 const FIELD_LENGTH = 20000;
 
 const keys = {
-  arrowLeft: {
-    pressed: false,
-  },
-  arrowRight: {
-    pressed: false,
-  },
-  arrowUp: {
-    pressed: false,
-  },
-  arrowDown: {
-    pressed: false,
-  },
+  arrowLeft: { pressed: false },
+  arrowRight: { pressed: false },
+  arrowUp: { pressed: false },
+  arrowDown: { pressed: false },
 };
 
 class Vector {
@@ -26,33 +18,22 @@ class Vector {
     this.x = x;
     this.y = y;
   }
-
   add(v) {
     this.x += v.x;
     this.y += v.y;
   }
-
   sub(v) {
     this.x -= v.x;
     this.y -= v.y;
   }
-
   mult(n) {
     this.x *= n;
     this.y *= n;
   }
-
   mag() {
-    return Math.sqrt(this.x * this.x + this.y + this.y);
+    return Math.sqrt(this.x * this.x + this.y * this.y);
   }
-
-  get() {
-    return new Vector(this.x, this.y);
-  }
-
   normalize() {
-    // this.x = normalize(this.x);
-    // this.y = normalize(this.y);
     const magnitude = Math.sqrt(this.x * this.x + this.y * this.y);
     if (magnitude !== 0) {
       this.x /= magnitude;
@@ -60,7 +41,6 @@ class Vector {
     }
     return this;
   }
-
   copy() {
     return new Vector(this.x, this.y);
   }
@@ -68,13 +48,9 @@ class Vector {
 
 class Player {
   constructor() {
-    // this.width = 20;
-    // this.height = 60;
     this.rotation = 0;
-
     const image = new Image();
     image.src = "./player.png";
-
     image.onload = () => {
       this.image = image;
       this.width = image.width * 0.12;
@@ -85,7 +61,6 @@ class Player {
       };
     };
   }
-
   draw() {
     if (!this.image) return;
     ctx.save();
@@ -113,29 +88,18 @@ class Cloud {
   constructor({ position, radius }) {
     this.position = position;
     this.radius = radius;
-    this.velocity = {
-      x: 0,
-      y: 3,
-    };
+    this.velocity = { x: 0, y: 3 };
   }
-
   draw() {
     ctx.beginPath();
     ctx.fillStyle = "white";
     ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI);
     ctx.fill();
     ctx.closePath();
-    // ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
   }
-
   update() {
-    if (player.rotation !== 0) {
-      this.position.x += this.velocity.x;
-      this.position.y += this.velocity.y;
-    } else {
-      this.position.x += this.velocity.x;
-      this.position.y += this.velocity.y;
-    }
+    this.position.x += this.velocity.x;
+    this.position.y += this.velocity.y;
   }
 }
 
@@ -144,9 +108,7 @@ class Emission {
     this.position = position;
     this.velocity = velocity;
     this.radius = 4;
-    this.blur = 1;
   }
-
   draw() {
     ctx.save();
     ctx.beginPath();
@@ -156,15 +118,9 @@ class Emission {
     ctx.closePath();
     ctx.restore();
   }
-
   update() {
-    if (player.rotation !== 0) {
-      this.position.x += this.velocity.x;
-      this.position.y += this.velocity.y;
-    } else {
-      this.position.x += this.velocity.x;
-      this.position.y += this.velocity.y;
-    }
+    this.position.x += this.velocity.x;
+    this.position.y += this.velocity.y;
   }
 }
 
@@ -174,33 +130,28 @@ class Missile {
     this.velocity = velocity;
     this.width = 10;
     this.height = 30;
-    this.flag = false;
+    this.angle = 0; // 회전 각도
 
     const image = new Image();
     image.src = "./missile.png";
-
     image.onload = () => {
       this.image = image;
       this.width = image.width * 0.06;
       this.height = image.height * 0.06;
     };
   }
-
   draw() {
     if (!this.image) return;
-    ctx.fillStyle = "red";
     ctx.save();
-
     ctx.translate(
       this.position.x + this.width / 2,
       this.position.y + this.height / 2
     );
-    ctx.rotate(-Math.atan2(this.velocity.x, this.velocity.y));
+    ctx.rotate(this.angle);
     ctx.translate(
       -this.position.x - this.width / 2,
       -this.position.y - this.height / 2
     );
-
     ctx.drawImage(
       this.image,
       this.position.x,
@@ -210,11 +161,9 @@ class Missile {
     );
     ctx.restore();
   }
-
   update() {
     this.position.x += this.velocity.x;
     this.position.y += this.velocity.y;
-
     this.draw();
   }
 }
@@ -222,7 +171,6 @@ class Missile {
 const player = new Player();
 
 const clouds = [];
-
 for (let i = 0; i < FIELD_LENGTH / 2; i++) {
   clouds.push(
     new Cloud({
@@ -240,27 +188,9 @@ for (let i = 0; i < FIELD_LENGTH / 2; i++) {
 }
 
 let emissions = [];
-const missiles = [
-  // new Missile({
-  //   position: {
-  //     x: canvas.width / 2 - 20,
-  //     y: 800,
-  //   },
-  //   velocity: {
-  //     x: 0,
-  //     y: 0,
-  //   },
-  //   acc: {
-  //     x: 0,
-  //     y: 0,
-  //   },
-  // }),
-];
+const missiles = [];
 
 let t = 0;
-let flag = false;
-let x = canvas.width / 2;
-let y = canvas.height / 2;
 function animate() {
   window.requestAnimationFrame(animate);
   ctx.fillStyle = "#d4eeff";
@@ -292,7 +222,6 @@ function animate() {
     }
     emission.velocity.x = 4 * direction.x;
     emission.velocity.y = 4 * direction.y;
-
     emission.update();
     emission.draw();
   });
@@ -300,75 +229,47 @@ function animate() {
   if (t % 7 === 0 && emissions.length < 20) {
     emissions.push(
       new Emission({
-        position: {
-          x: canvas.width / 2,
-          y: canvas.height / 2,
-        },
-        velocity: {
-          x: 5 * direction.x,
-          y: 5 * direction.y,
-        },
+        position: { x: canvas.width / 2, y: canvas.height / 2 },
+        velocity: { x: 5 * direction.x, y: 5 * direction.y },
       })
     );
   }
 
-  if (keys.arrowLeft.pressed) {
-    player.rotation -= 0.05;
-  } else if (keys.arrowRight.pressed) {
-    player.rotation += 0.05;
-  }
+  if (keys.arrowLeft.pressed) player.rotation -= 0.05;
+  else if (keys.arrowRight.pressed) player.rotation += 0.05;
+
   player.draw();
 
-  let direction2 = new Vector(
-    -Math.sin(player.rotation),
-    Math.cos(player.rotation)
-  );
-
-  // if (t % 100 === 0) {
-  //   missiles.push(
-  //     new Missile({
-  //       position: {
-  //         x: canvas.width / 2 - player.width / 2 + 10 + direction2.x * 800,
-  //         y: canvas.height / 2 + direction2.y * 800,
-  //       },
-  //       velocity: {
-  //         x: -5 * direction.x,
-  //         y: -5 * direction.y,
-  //       },
-  //       acc: {
-  //         x: 0,
-  //         y: 0,
-  //       },
-  //     })
-  //   );
-  // }
+  // 미사일 발사 주기
   if (t % 100 === 0) {
     missiles.push(
       new Missile({
-        position: {
-          x: 10,
-          y: 700,
-        },
-        velocity: {
-          x: 0,
-          y: 5,
-        },
+        position: { x: 10, y: 700 },
+        velocity: { x: 0, y: 5 },
       })
     );
   }
 
+  // 미사일 유도
   missiles.forEach((missile) => {
-    let angle_x = x + direction.x * 40 - missile.position.x;
-    let angle_y = y + direction.y * 40 - missile.position.y;
+    const targetX = canvas.width / 2;
+    const targetY = canvas.height / 2;
 
-    angle = Math.atan2(angle_y, angle_x);
-    direction3 = new Vector(Math.cos(angle), Math.sin(angle));
-    let delay = 0.4;
-    missile.velocity.x = direction3.x * 10;
-    missile.velocity.y = direction3.y * 10;
+    const dx = targetX - missile.position.x;
+    const dy = targetY - missile.position.y;
+    const targetAngle = Math.atan2(dy, dx);
 
-    ctx.fillStyle = "red";
-    ctx.fillRect(x + direction.x * 40, y + direction.y * 40, 10, 10);
+    let diff = targetAngle - missile.angle;
+    diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+    missile.angle += diff * 0.05; // 유도 회전 속도
+
+    const baseSpeed = 5;
+    missile.velocity.x = Math.cos(missile.angle) * baseSpeed;
+    missile.velocity.y = Math.sin(missile.angle) * baseSpeed;
+
+    // 구름처럼 플레이어 각도에 따른 월드 속도 보정
+    missile.velocity.x += 2 * direction.x;
+    missile.velocity.y += 2 * direction.y;
 
     missile.update();
   });
