@@ -33,7 +33,7 @@ let direction = new Vector(
 <img src="./screen02.png" width="500">
 
 - 미사일 생성
-- 미사일의 방향 - velocity 에 따른 각도 설정
+- 미사일의 방향 - 비행기의 각도에 따라 설정
 
 ```js
 ctx.rotate(-Math.atan2(this.velocity.x, this.velocity.y));
@@ -53,3 +53,4 @@ ctx.rotate(-Math.atan2(this.velocity.x, this.velocity.y));
 
 - 프로젝트 다시 시작
 - 미사일 유도 코드 수정
+- 미사일 방향 수정
