@@ -244,12 +244,14 @@ function animate() {
 
   player.draw();
 
-  // 미사일 발사 주기
-  if (t % 10000 === 0) {
+  if (t % 400 === 0) {
     missiles.push(
       new Missile({
-        position: { x: 1200, y: 10 },
-        velocity: { x: 7, y: 5 },
+        position: {
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+        },
+        velocity: { x: Math.random() * 10, y: Math.random() * 10 },
       })
     );
   }
@@ -316,9 +318,19 @@ function animate() {
     missile.velocity.x = Math.cos(missile.angle) * baseSpeed;
     missile.velocity.y = Math.sin(missile.angle) * baseSpeed;
 
-    // 구름처럼 플레이어 각도에 따른 월드 속도 보정
-    missile.velocity.x += 2 * direction.x;
-    missile.velocity.y += 2 * direction.y;
+    // 중앙(비행기)과의 거리 계산
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const distanceToCenter = Math.sqrt(
+      Math.pow(missile.position.x - centerX, 2) +
+        Math.pow(missile.position.y - centerY, 2)
+    );
+
+    // 구름처럼 플레이어 각도에 따른 월드 속도 보정 (거리가 500 이하일 때만)
+    if (distanceToCenter <= 300) {
+      missile.velocity.x += 2 * direction.x;
+      missile.velocity.y += 2 * direction.y;
+    }
 
     missile.update();
   });
