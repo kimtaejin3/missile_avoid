@@ -147,7 +147,7 @@ class Missile {
       this.position.x + this.width / 2,
       this.position.y + this.height / 2
     );
-    ctx.rotate(this.angle);
+    ctx.rotate(Math.atan2(-this.velocity.x, this.velocity.y));
     ctx.translate(
       -this.position.x - this.width / 2,
       -this.position.y - this.height / 2
